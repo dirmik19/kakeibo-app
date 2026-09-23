@@ -36,6 +36,10 @@ const ReceiptSchema = z.object({
     .string()
     .nullable()
     .describe("購入日（YYYY-MM-DD形式）。読み取れない場合はnull"),
+  time: z
+    .string()
+    .nullable()
+    .describe("購入時刻（24時間表記のHH:MM形式）。読み取れない場合はnull"),
   items: z
     .array(
       z.object({
@@ -59,7 +63,7 @@ const ReceiptSchema = z.object({
 });
 
 const SYSTEM_PROMPT = `あなたは日本のレシートを読み取る家計簿アシスタントです。
-画像のレシートから、店名・購入日・商品ごとの名前と金額・合計金額を抽出してください。
+画像のレシートから、店名・購入日時・商品ごとの名前と金額・合計金額を抽出してください。
 
 ルール:
 - 金額は円単位の整数で返してください。
@@ -130,9 +134,12 @@ export async function readReceipt(imageBuffer, mediaType) {
     throw new ReceiptReadError("読み取り結果を解析できませんでした。");
   }
 
-  // 日付の形式が正しくない場合は「不明」として扱う
+  // 日付・時刻の形式が正しくない場合は「不明」として扱う
   if (receipt.date && !/^\d{4}-\d{2}-\d{2}$/.test(receipt.date)) {
     receipt.date = null;
+  }
+  if (receipt.time && !/^([01]\d|2[0-3]):[0-5]\d$/.test(receipt.time)) {
+    receipt.time = null;
   }
 
   // 一覧にないカテゴリが返ってきた場合は「その他」にする

@@ -169,6 +169,34 @@ button:disabled {
   margin-top: 12px;
 }
 
+.message p {
+  margin: 0;
+}
+
+.message p + p {
+  margin-top: 4px;
+}
+
+.message-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.message-actions button:not(.primary) {
+  padding: 8px 16px;
+  border: 1px solid currentColor;
+  border-radius: 8px;
+  background: transparent;
+  cursor: pointer;
+}
+
+.negative {
+  color: var(--warning-text);
+  font-weight: 600;
+}
+
 .message.success {
   background: var(--success-bg);
   color: var(--success-text);

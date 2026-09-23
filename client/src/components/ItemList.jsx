@@ -8,7 +8,9 @@ export default function ItemList({ items, onChangeCategory, onDelete }) {
   }
 
   // 新しい日付が上に来るように並べる
-  const sorted = [...items].sort((a, b) => b.date.localeCompare(a.date));
+  const sorted = [...items].sort((a, b) =>
+    `${b.date} ${b.time ?? ""}`.localeCompare(`${a.date} ${a.time ?? ""}`),
+  );
   const total = items.reduce((sum, item) => sum + item.price, 0);
 
   return (
@@ -29,7 +31,10 @@ export default function ItemList({ items, onChangeCategory, onDelete }) {
         <tbody>
           {sorted.map((item) => (
             <tr key={item.id}>
-              <td className="nowrap">{item.date}</td>
+              <td className="nowrap">
+                {item.date}
+                {item.time && <span className="muted"> {item.time}</span>}
+              </td>
               <td>{item.storeName ?? "—"}</td>
               <td>{item.name}</td>
               <td>
@@ -46,7 +51,15 @@ export default function ItemList({ items, onChangeCategory, onDelete }) {
                   ))}
                 </select>
               </td>
-              <td className="num nowrap">{formatYen(item.price)}</td>
+              {/* マイナスの金額は読み取りミスの可能性があるので目立たせる */}
+              {item.price < 0 ? (
+                <td className="num nowrap negative" title="金額がマイナスです">
+                  <span aria-hidden="true">⚠ </span>
+                  {formatYen(item.price)}
+                </td>
+              ) : (
+                <td className="num nowrap">{formatYen(item.price)}</td>
+              )}
               <td>
                 <button
                   type="button"

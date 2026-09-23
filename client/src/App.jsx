@@ -5,6 +5,7 @@ import ItemList from "./components/ItemList.jsx";
 import CategoryChart from "./components/CategoryChart.jsx";
 import MonthlyChart from "./components/MonthlyChart.jsx";
 import { useColorScheme } from "./useColorScheme.js";
+import { findDuplicateReceipt, findNegativeItems } from "./validation.js";
 import {
   formatMonth,
   formatYen,
@@ -19,6 +20,8 @@ export default function App() {
   const [items, setItems] = useState(loadItems);
   const [selectedMonth, setSelectedMonth] = useState(() => toMonth(today()));
   const [notice, setNotice] = useState(null);
+  // 重複の可能性があり、登録するか確認中のレシート
+  const [pending, setPending] = useState(null);
   const scheme = useColorScheme();
 
   // 商品一覧が変わるたびにローカルストレージへ保存する
@@ -37,15 +40,32 @@ export default function App() {
   );
   const monthTotal = monthItems.reduce((sum, item) => sum + item.price, 0);
 
-  // 読み取り結果を一覧に追加する
+  // 読み取り結果を検証し、問題がなければ一覧に追加する
   function handleScanned(receipt) {
-    const receiptId = crypto.randomUUID();
     // 日付が読み取れなかった場合は今日の日付にする
-    const date = receipt.date ?? today();
+    const scanned = {
+      ...receipt,
+      date: receipt.date ?? today(),
+      dateMissing: receipt.date === null,
+    };
+
+    // 同じ日時・合計金額のレシートがあれば、登録する前に確認する
+    const duplicate = findDuplicateReceipt(scanned, items);
+    if (duplicate) {
+      setNotice(null);
+      setPending({ receipt: scanned, duplicate });
+      return;
+    }
+    registerReceipt(scanned);
+  }
+
+  function registerReceipt(receipt) {
+    const receiptId = crypto.randomUUID();
     const newItems = receipt.items.map((item) => ({
       id: crypto.randomUUID(),
       receiptId,
-      date,
+      date: receipt.date,
+      time: receipt.time,
       storeName: receipt.storeName,
       name: item.name,
       price: item.price,
@@ -53,20 +73,43 @@ export default function App() {
     }));
 
     setItems((prev) => [...prev, ...newItems]);
-    setSelectedMonth(toMonth(date));
+    setSelectedMonth(toMonth(receipt.date));
+    setPending(null);
 
+    const messages = [
+      `${receipt.storeName ?? "レシート"}（${receipt.date}）から${newItems.length}件を登録しました。`,
+    ];
+    const warnings = [];
+    if (receipt.dateMissing) {
+      warnings.push("日付が読み取れなかったため、今日の日付で登録しています。");
+    }
+    // 金額が負の値の商品がある場合は確認を促す
+    const negativeItems = findNegativeItems(newItems);
+    if (negativeItems.length > 0) {
+      const list = negativeItems
+        .map((item) => `「${item.name}」${formatYen(item.price)}`)
+        .join("、");
+      warnings.push(
+        `金額がマイナスの商品があります：${list}。値引きでない場合は読み取りミスの可能性があるため、明細を確認してください。`,
+      );
+    }
     // レシートの合計と読み取った金額の合計が違う場合は確認を促す
     const sum = newItems.reduce((total, item) => total + item.price, 0);
-    const mismatch = receipt.total !== null && receipt.total !== sum;
+    if (receipt.total !== null && receipt.total !== sum) {
+      warnings.push(
+        `レシートの合計（${formatYen(receipt.total)}）と読み取った金額の合計（${formatYen(sum)}）が一致しません。内容を確認してください。`,
+      );
+    }
+
     setNotice({
-      type: mismatch ? "warning" : "success",
-      text:
-        `${receipt.storeName ?? "レシート"}（${date}）から${newItems.length}件を登録しました。` +
-        (receipt.date ? "" : "日付が読み取れなかったため、今日の日付で登録しています。") +
-        (mismatch
-          ? `レシートの合計（${formatYen(receipt.total)}）と読み取った金額の合計（${formatYen(sum)}）が一致しません。内容を確認してください。`
-          : ""),
+      type: warnings.length > 0 ? "warning" : "success",
+      messages: [...messages, ...warnings],
     });
+  }
+
+  function handleCancelPending() {
+    setPending(null);
+    setNotice({ type: "success", messages: ["登録を取り消しました。"] });
   }
 
   function handleChangeCategory(id, category) {
@@ -89,10 +132,36 @@ export default function App() {
       </header>
 
       <ReceiptUploader onScanned={handleScanned} />
+      {pending && (
+        <div className="message warning" role="alert">
+          <p>
+            同じ日時（{pending.duplicate.date}
+            {pending.duplicate.time && ` ${pending.duplicate.time}`}
+            ）・同じ合計金額（{formatYen(pending.duplicate.total)}
+            ）のレシート
+            {pending.duplicate.storeName && `（${pending.duplicate.storeName}）`}
+            が既に登録されています。二重登録の可能性があります。
+          </p>
+          <div className="message-actions">
+            <button
+              type="button"
+              className="primary"
+              onClick={() => registerReceipt(pending.receipt)}
+            >
+              それでも登録する
+            </button>
+            <button type="button" onClick={handleCancelPending}>
+              登録しない
+            </button>
+          </div>
+        </div>
+      )}
       {notice && (
-        <p className={`message ${notice.type}`} role="status">
-          {notice.text}
-        </p>
+        <div className={`message ${notice.type}`} role="status">
+          {notice.messages.map((text) => (
+            <p key={text}>{text}</p>
+          ))}
+        </div>
       )}
 
       <div className="month-bar">

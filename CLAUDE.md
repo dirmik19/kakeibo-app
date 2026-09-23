@@ -25,6 +25,7 @@ kakeibo-app/
         ├── App.jsx       # 画面全体・状態管理
         ├── constants.js  # カテゴリ・グラフの色
         ├── utils.js      # 保存・日付・金額・画像縮小の関数
+        ├── validation.js # 負の金額・重複レシートの検証（テストは validation.test.js）
         └── components/   # アップロード・明細・円グラフ・棒グラフ
 ```
 
@@ -32,6 +33,7 @@ kakeibo-app/
 
 - 初回セットアップ: `npm run install:all`（その後 `server/.env.example` を `server/.env` にコピーしてAPIキーを設定）
 - 開発サーバー起動: `npm run dev`（server と client を同時に起動）
+- テスト: `npm test`（`client/src/**/*.test.js` を Node.js 標準のテストランナーで実行）
 - フロントエンドのビルド: `npm run build`
 
 ## 実装上の決まりごと
