@@ -1,0 +1,20 @@
+{
+  "name": "kakeibo-app",
+  "scripts": {
+    "install:all": "npm install && npm install --prefix server && npm install --prefix client",
+    "dev": "concurrently -n server,client -c blue,green \"npm run dev --prefix server\" \"npm run dev --prefix client\"",
+    "build": "npm run build --prefix client"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/dirmik19/kakeibo-app.git"
+  },
+  "bugs": {
+    "url": "https://github.com/dirmik19/kakeibo-app/issues"
+  },
+  "homepage": "https://github.com/dirmik19/kakeibo-app#readme",
+  "devDependencies": {
+    "concurrently": "^10.0.5"
+  },
+  "private": true
+}

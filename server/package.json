@@ -1,0 +1,15 @@
+{
+  "name": "kakeibo-server",
+  "scripts": {
+    "dev": "node --watch --env-file-if-exists=.env index.js",
+    "start": "node --env-file-if-exists=.env index.js"
+  },
+  "type": "module",
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.128.0",
+    "express": "^5.2.1",
+    "multer": "^2.4.0",
+    "zod": "^4.6.5"
+  },
+  "private": true
+}

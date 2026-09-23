@@ -1,0 +1,316 @@
+/* 色の定義（ライトモード） */
+:root {
+  color-scheme: light;
+  --bg: #f6f5f2;
+  --surface: #ffffff;
+  --border: #e3e2de;
+  --text: #0b0b0b;
+  --text-muted: #52514e;
+  --accent: #2a78d6;
+  --accent-text: #ffffff;
+  --success-bg: #e6f4ec;
+  --success-text: #0f5b33;
+  --warning-bg: #fdf1d8;
+  --warning-text: #6b4a00;
+  --error-bg: #fbe5e4;
+  --error-text: #8f1f1e;
+}
+
+/* 色の定義（ダークモード） */
+@media (prefers-color-scheme: dark) {
+  :root {
+    color-scheme: dark;
+    --bg: #141413;
+    --surface: #1f1f1e;
+    --border: #383835;
+    --text: #f5f5f3;
+    --text-muted: #c3c2b7;
+    --accent: #3987e5;
+    --accent-text: #ffffff;
+    --success-bg: #173526;
+    --success-text: #a8e2c0;
+    --warning-bg: #3a2d0c;
+    --warning-text: #f3d48b;
+    --error-bg: #3d1a19;
+    --error-text: #f4b3b2;
+  }
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: system-ui, -apple-system, "Hiragino Sans", "Yu Gothic UI",
+    "Meiryo", sans-serif;
+  line-height: 1.6;
+}
+
+h1,
+h2 {
+  margin: 0;
+  line-height: 1.3;
+}
+
+h1 {
+  font-size: 1.6rem;
+}
+
+h2 {
+  font-size: 1.05rem;
+  margin-bottom: 12px;
+}
+
+button,
+select,
+input {
+  font: inherit;
+  color: inherit;
+}
+
+.app {
+  max-width: 1080px;
+  margin: 0 auto;
+  padding: 24px 16px 48px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.app-header p {
+  margin: 4px 0 0;
+}
+
+.muted {
+  color: var(--text-muted);
+}
+
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 16px;
+  min-width: 0;
+}
+
+/* アップロード部分 */
+.uploader {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.file-picker {
+  flex: 1 1 240px;
+  position: relative;
+  display: flex;
+  align-items: center;
+  padding: 8px 12px;
+  border: 1px dashed var(--border);
+  border-radius: 8px;
+  cursor: pointer;
+  color: var(--text-muted);
+  overflow: hidden;
+}
+
+.file-picker span {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.file-picker input {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.file-picker:focus-within {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+button.primary {
+  padding: 8px 20px;
+  border: none;
+  border-radius: 8px;
+  background: var(--accent);
+  color: var(--accent-text);
+  font-weight: 600;
+  cursor: pointer;
+}
+
+button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.preview {
+  display: block;
+  max-width: 100%;
+  max-height: 320px;
+  margin-top: 12px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+}
+
+/* メッセージ */
+.message {
+  margin: 0;
+  padding: 10px 14px;
+  border-radius: 8px;
+}
+
+.card .message {
+  margin-top: 12px;
+}
+
+.message.success {
+  background: var(--success-bg);
+  color: var(--success-text);
+}
+
+.message.warning {
+  background: var(--warning-bg);
+  color: var(--warning-text);
+}
+
+.message.error {
+  background: var(--error-bg);
+  color: var(--error-text);
+}
+
+/* 月の選択と合計 */
+.month-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.month-bar label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.month-total {
+  margin: 0;
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+}
+
+.month-total strong {
+  font-size: 1.6rem;
+  font-variant-numeric: tabular-nums;
+}
+
+select {
+  padding: 4px 8px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--surface);
+}
+
+/* グラフ */
+.chart-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 420px), 1fr));
+  gap: 16px;
+}
+
+.chart-box {
+  position: relative;
+  height: 280px;
+}
+
+.category-chart {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.swatch {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  border-radius: 2px;
+  margin-right: 8px;
+}
+
+/* 表 */
+.table-wrap {
+  overflow-x: auto;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.summary-table td,
+.item-table th,
+.item-table td {
+  padding: 6px 8px;
+  border-bottom: 1px solid var(--border);
+  text-align: left;
+  vertical-align: middle;
+}
+
+.item-table th {
+  color: var(--text-muted);
+  font-weight: 600;
+  font-size: 0.875rem;
+}
+
+.item-table tfoot td {
+  font-weight: 700;
+  border-bottom: none;
+}
+
+.num {
+  text-align: right !important;
+  font-variant-numeric: tabular-nums;
+}
+
+.nowrap {
+  white-space: nowrap;
+}
+
+.icon-button {
+  width: 32px;
+  height: 32px;
+  border: none;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--text-muted);
+  font-size: 1.1rem;
+  cursor: pointer;
+}
+
+.icon-button:hover {
+  background: var(--error-bg);
+  color: var(--error-text);
+}
+
+.empty {
+  margin: 0;
+  padding: 24px 0;
+  text-align: center;
+  color: var(--text-muted);
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
